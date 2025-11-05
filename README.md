@@ -20,3 +20,6 @@
 ## What’s here vs private
 - **Public mirror:** metrics, dashboards, docs, releases.
 - **Private core:** proprietary algorithms, data pipelines, tuning logic.
+
+### Theoretical Appendix
+See [Backpropagation vs Resonance Learning](docs/theory/backprop_vs_resonance.md) for how LumenCore replaces gradient descent with harmonic learning loops.
