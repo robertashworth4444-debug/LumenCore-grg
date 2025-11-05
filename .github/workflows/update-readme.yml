@@ -1,27 +1,29 @@
 name: Update README Metrics
-
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "0 5 * * *"   # daily 05:00 UTC
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Fetch public KPIs from VPS
+      - name: Fetch public KPIs from VPS and update README
+        env:
+          API_URL: http://5.161.52.158:8080/api/public
         run: |
           set -e
-          curl -sS http://5.161.52.158:8080/api/public -o metrics.json || echo '{}' > metrics.json
+          curl -fsS "$API_URL" -o metrics.json || echo '{}' > metrics.json
           python3 - <<'PY'
           import json, re, pathlib
           p = pathlib.Path("README.md")
           s = p.read_text()
           k = json.load(open("metrics.json"))
           block = json.dumps(k, indent=2)
-          s = re.sub(r"```json[\\s\\S]*?```", f"```json\\n{block}\\n```", s)
+          s = re.sub(r"```json[\\s\\S]*?```", "```json\\n"+block+"\\n```", s, count=1)
           p.write_text(s)
           PY
 
@@ -29,8 +31,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "ci: nightly README metrics update" || echo "Nothing to commit"
+          git diff --cached --quiet && echo "No changes to commit" || git commit -m "docs: update README metrics"
           git push
