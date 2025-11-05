@@ -1,0 +1,45 @@
+name: LumenCore Autosync
+on:
+  schedule:
+    - cron: "0 2 * * *"  # 02:00 UTC daily
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch public KPIs from VPS
+        env:
+          VPS_IP: ${{ secrets.VPS_IP }}
+        run: |
+          set -e
+          curl -sS http://$VPS_IP:8080/api/public -o metrics.json || echo '{}' > metrics.json
+          python3 - <<'PY'
+import json, datetime
+from pathlib import Path
+k = json.load(open("metrics.json"))
+snap = {
+  "generated_at": datetime.datetime.utcnow().isoformat()+"Z",
+  "github": k.get("github",{}),
+  "packages": k.get("packages",{}),
+  "telemetry": k.get("telemetry",{})
+}
+Path("adoption-snapshot.json").write_text(json.dumps(snap,indent=2))
+PY
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add adoption-snapshot.json || true
+          git commit -m "data: nightly autosync KPI snapshot" || true
+          git push
+      - name: Publish nightly release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SNAPSHOT_DATE=$(date +"%Y%m%d")
+          TAG="snapshot-$SNAPSHOT_DATE"
+          RELEASE_NAME="LumenCore KPI Snapshot $SNAPSHOT_DATE"
+          curl -s -X POST -H "Authorization: Bearer $GH_TOKEN" \
+               -H "Accept: application/vnd.github+json" \
+               https://api.github.com/repos/${{ github.repository }}/releases \
+               -d "{\"tag_name\":\"$TAG\",\"name\":\"$RELEASE_NAME\",\"body\":\"Automated nightly KPI sync\"}"
