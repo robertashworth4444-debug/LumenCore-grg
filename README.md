@@ -1,5 +1,11 @@
 # LumenCore™ – Public Mirror
 
+### Status
+[![Stars](https://img.shields.io/github/stars/robertrashworth4444-debug/LumenCore-grg?style=social)](https://github.com/robertrashworth4444-debug/LumenCore-grg/stargazers)
+[![API Health](https://img.shields.io/website?url=http%3A%2F%2F5.161.52.158%3A8080%2Fhealth)](http://5.161.52.158:8080/health)
+[![Last Run](https://img.shields.io/github/actions/workflow/status/robertrashworth4444-debug/LumenCore-grg/lumencore_autosync.yml?branch=main)](https://github.com/robertrashworth4444-debug/LumenCore-grg/actions)
+
+
 [![GitHub stars](https://img.shields.io/github/stars/robertashworth4444-debug/LumenCore-grg?style=social)](https://github.com/robertashworth4444-debug/LumenCore-grg/stargazers)
 [![API Health](https://img.shields.io/website?url=http%3A%2F%2F5.161.52.158%3A8080%2Fapi%2Fpublic)](http://5.161.52.158:8080/api/public)
 
