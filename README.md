@@ -23,3 +23,13 @@
 
 ### Theoretical Appendix
 See [Backpropagation vs Resonance Learning](docs/theory/backprop_vs_resonance.md) for how LumenCore replaces gradient descent with harmonic learning loops.
+
+## Executive KPI Summary
+**Date:** $(date +%Y-%m-%d)
+
+- [LumenCore KPI Report](https://github.com/robertrashworth4444-debug/LumenCore-grg/releases/latest)
+- [Master Investor Dossier](https://github.com/robertrashworth4444-debug/LumenCore-grg/releases/latest)
+- [NovaCore Technical Proof Report](https://github.com/robertrashworth4444-debug/LumenCore-grg/releases/latest)
+
+🌐 **Live API:** http://5.161.52.158:8080/api/public  
+📊 **Nightly Sync:** Automated via GitHub Actions  
