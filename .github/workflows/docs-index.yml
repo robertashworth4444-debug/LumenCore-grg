@@ -1,0 +1,29 @@
+name: Index Documents
+on:
+  schedule: [{ cron: "30 2 * * *" }]
+  workflow_dispatch:
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build docs index in README
+        run: |
+          python3 - <<'PY'
+from pathlib import Path
+import re, glob
+p=Path("README.md"); s=p.read_text()
+docs = sorted(glob.glob("**/*.pdf"), key=str.lower)
+block = "## Documents (Auto-Indexed)\n" + "\n".join([f"- [{Path(d).name}]({d})" for d in docs]) + "\n"
+if "## Documents (Auto-Indexed)" in s:
+    s = re.sub(r"## Documents \(Auto-Indexed\)[\s\S]*?(?=\n##|$)", block, s)
+else:
+    s = s + "\n" + block
+p.write_text(s)
+PY
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: refresh auto-indexed documents" || true
+          git push

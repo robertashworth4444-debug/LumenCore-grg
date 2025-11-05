@@ -1,0 +1,32 @@
+name: Publish Nightly LumenCore Release
+on:
+  workflow_run:
+    workflows: ["Update README Metrics"]
+    types: [completed]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create timestamp
+        id: vars
+        run: echo "ts=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
+      - name: Build changelog
+        run: |
+          echo "LumenCore nightly KPI and GRG dataset release" > notes.txt
+          echo "" >> notes.txt
+          for f in Lumen*.pdf Nova*.pdf *.docx; do
+            [ -f "$f" ] && echo "- $f" >> notes.txt
+          done
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: nightly-${{ steps.vars.outputs.ts }}
+          name: LumenCore Nightly ${{ steps.vars.outputs.ts }}
+          body_path: notes.txt
+          files: |
+            Lumen*.pdf
+            Nova*.pdf
+            *.docx
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

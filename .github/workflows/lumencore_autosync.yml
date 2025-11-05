@@ -1,0 +1,24 @@
+name: LumenCore Autosync
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch public KPIs from VPS
+        run: |
+          set -e
+          curl -fsS http://$VPS_IP:8080/api/public -o metrics.json || echo '{}' > metrics.json
+      - name: Commit and push updated metrics
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add metrics.json
+          git commit -m "ci: nightly metrics autosync" || true
+          git push

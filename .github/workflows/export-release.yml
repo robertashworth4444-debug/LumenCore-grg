@@ -1,0 +1,58 @@
+name: Export & Publish Snapshot
+on:
+  workflow_run:
+    workflows: ["LumenCore Autosync"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  export_release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install exporters
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y pandoc zip
+
+      - name: Build README.pdf and package ZIP
+        run: |
+          TS=$(date +%Y%m%d-%H%M)
+          echo "$TS" > .export_ts
+          pandoc -f gfm -t pdf README.md -o README.pdf || true
+          mkdir -p artifacts
+          cp -f README.md README.pdf adoption-snapshot.json 2>/dev/null || true
+          # include any PDFs in repo (whitepapers, reports)
+          find . -type f -name "*.pdf" -maxdepth 3 -print0 | xargs -0 -I{} cp -f "{}" artifacts/ 2>/dev/null || true
+          cp -f README.pdf artifacts/ 2>/dev/null || true
+          cp -f adoption-snapshot.json artifacts/ 2>/dev/null || true
+          zip -r "lumen_snapshot_${TS}.zip" artifacts
+
+      - name: Create/Update nightly release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: snapshot-${{ steps.ts.outputs.ts || '' }}
+          name: LumenCore KPI Snapshot ${{ steps.ts.outputs.ts || '' }}
+          body: "Automated snapshot (exported after autosync)."
+          files: |
+            README.pdf
+            lumen_snapshot_*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: release
+
+      - name: Notify Discord (optional)
+        if: ${{ vars.DISCORD_WEBHOOK != '' }}
+        run: |
+          TS=$(cat .export_ts 2>/dev/null || date +%Y%m%d-%H%M)
+          MSG="✅ LumenCore autosync exported — snapshot ${TS} published.\nReleases: https://github.com/${{ github.repository }}/releases/latest"
+          curl -s -H "Content-Type: application/json" -d "{\"content\":\"${MSG}\"}" "${{ vars.DISCORD_WEBHOOK }}" || true
+
+      - name: Save TS for downstream use
+        id: ts
+        run: echo "ts=$(cat .export_ts 2>/dev/null || date +%Y%m%d-%H%M)" >> "$GITHUB_OUTPUT"

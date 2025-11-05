@@ -1,0 +1,9 @@
+{
+  "title": "LumenCore – Public KPI & GRG Dataset",
+  "creators": [{"name": "Ashworth, Robert", "affiliation": "LumenCore"}],
+  "description": "Nightly KPI snapshots and GRG documents auto-published from the LumenCore VPS.",
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "upload_type": "dataset",
+  "keywords": ["LumenCore", "NovaCore", "GRG", "AI-ops", "Smart grid", "Energy harmonics"]
+}

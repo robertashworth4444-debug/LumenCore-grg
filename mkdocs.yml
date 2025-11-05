@@ -1,0 +1,9 @@
+site_name: LumenCore Investor Portal
+repo_url: https://github.com/robertashworth4444-debug/LumenCore-grg
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - KPIs: kpi.md
+  - Documents: docs_index.md
+  - Architecture: architecture.md

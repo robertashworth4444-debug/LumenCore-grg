@@ -1,0 +1,18 @@
+{
+  "generated_at": "2025-11-05T04:53:40.501879Z",
+  "github": {
+    "month": "2025-11-01",
+    "stars": 135458,
+    "issues_open": 8,
+    "prs_open": 22
+  },
+  "packages": {
+    "month": "2025-11-01",
+    "pypi_downloads": 195766427.0,
+    "docker_pulls": 9726829695.0
+  },
+  "telemetry": {
+    "month": null,
+    "active_installs_est": 0
+  }
+}
