@@ -1,0 +1,20 @@
+Mutual Non-Disclosure Agreement
+
+1) Confidential Info. “CI” means non-public information disclosed by either party (Discloser) to the other (Recipient) in any form, including technical, product, roadmap, code, data, financial, business, and materials, marked or reasonably understood as confidential.
+
+2) Use + Care. Recipient will (a) use CI only to evaluate or perform a potential or existing business relationship between the parties; (b) not disclose CI to anyone except its employees/contractors/advisors who need to know and are bound by similar confidentiality; and (c) protect CI with at least reasonable care.
+
+3) Exclusions. CI does not include information that is (i) publicly known without breach; (ii) already known without duty of confidentiality; (iii) independently developed without use of CI; or (iv) disclosed under legal compulsion (with prompt notice if lawful).
+
+4) No License. No IP rights are granted by this NDA. All CI remains Discloser’s property.
+
+5) Term + Survival. This NDA begins on the Effective Date and lasts 2 years. Confidentiality obligations for CI disclosed during the term survive for 3 years after termination/expiration.
+
+6) Return/Destroy. Upon request, Recipient will return or destroy CI (and certify destruction if asked), except archival backups maintained under standard retention.
+
+7) Remedies + Misc. Breach may cause irreparable harm; injunctive relief is available in addition to other remedies. This NDA is non-assignable without consent, governed by Tennessee law, with exclusive venue in Davidson County, TN. Entire agreement; amendments in writing.
+
+Effective Date: ___________
+Discloser: _______________________   Recipient: _______________________
+Name/Title: ______________________   Name/Title: _____________________
+Signature: _______________________   Signature: ______________________
