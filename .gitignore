@@ -1,15 +1,29 @@
-# Python
-__pycache__/
-*.pyc
-.venv/
-.env
+# keep the project glorious — only ignore junk & secrets
 
-# Node / JS
+# Python build/runtime noise
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.sqlite3
+
+# Local runtime/state
+.venv/
+run/
+logs/
+*.pid
+*.log
+
+# OS/editor noise
+.DS_Store
+*.swp
+Thumbs.db
+
+# Real secrets (keep .env.sample, ignore real .env)
+.env
+*.key
+*.pem
+
+# Node/JS (if any)
 node_modules/
 dist/
 build/
-
-# System / Editor
-.DS_Store
-*.swp
-*.log
