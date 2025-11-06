@@ -1,0 +1,17 @@
+{
+  "title": "NovaCore Eye v2",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    { "type":"stat","title":"Total Incidents","targets":[{"expr":"whitehole_incidents_total","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":4,"w":6,"x":0,"y":0}},
+    { "type":"stat","title":"High Severity","targets":[{"expr":"whitehole_incidents_high_total","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":4,"w":6,"x":6,"y":0}},
+    { "type":"stat","title":"NATS Connections","targets":[{"expr":"nats_connections","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":4,"w":6,"x":12,"y":0}},
+    { "type":"stat","title":"Exporter Up","targets":[{"expr":"nova_exporter_timestamp > time() - 60","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":4,"w":6,"x":18,"y":0}},
+    { "type":"bargauge","title":"Actions OK (by type)","targets":[{"expr":"whitehole_actions_ok_total","legendFormat":"{{action}}","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":8,"w":12,"x":0,"y":4}},
+    { "type":"bargauge","title":"Actions FAIL (by type)","targets":[{"expr":"whitehole_actions_fail_total","legendFormat":"{{action}}","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":8,"w":12,"x":12,"y":4}},
+    { "type":"timeseries","title":"Avg Heal Duration (ms)","targets":[{"expr":"whitehole_actions_avg_duration_ms","legendFormat":"{{action}}","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":8,"w":24,"x":0,"y":12}},
+    { "type":"timeseries","title":"Latency Breaches per Service","targets":[{"expr":"whitehole_latency_breaches_total","legendFormat":"{{service}}","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":8,"w":12,"x":0,"y":20}},
+    { "type":"timeseries","title":"CPU Breaches per Service","targets":[{"expr":"whitehole_cpu_breaches_total","legendFormat":"{{service}}","refId":"A","datasource":"Prometheus"}],"gridPos":{"h":8,"w":12,"x":12,"y":20}}
+  ]
+}

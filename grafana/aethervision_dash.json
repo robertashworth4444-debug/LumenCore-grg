@@ -1,0 +1,18 @@
+{
+  "title": "AetherVision (3D Control Room)",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "text",
+      "title": "AetherVision",
+      "gridPos": {"h":24,"w":24,"x":0,"y":0},
+      "options": { "mode":"html" },
+      "transparent": true,
+      "pluginVersion": "10.x",
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "targets": [],
+      "optionsHtml": "<iframe src='http://127.0.0.1:8088/' width='100%' height='900' frameborder='0'></iframe>"
+    }
+  ]
+}

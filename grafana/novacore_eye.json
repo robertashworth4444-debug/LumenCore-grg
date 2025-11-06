@@ -1,0 +1,50 @@
+{
+  "title": "NovaCore Eye",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total Incidents",
+      "targets": [{ "expr": "whitehole_incidents_total", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":4,"w":6,"x":0,"y":0}
+    },
+    {
+      "type": "stat",
+      "title": "High-Severity Incidents",
+      "targets": [{ "expr": "whitehole_incidents_high_total", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":4,"w":6,"x":6,"y":0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Incident Rate (5m)",
+      "targets": [{ "expr": "rate(whitehole_incidents_total[5m])", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":8,"w":12,"x":0,"y":4}
+    },
+    {
+      "type": "bargauge",
+      "title": "Actions Fired (by type)",
+      "targets": [{ "expr": "whitehole_actions_total", "legendFormat": "{{action}}", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":8,"w":12,"x":12,"y":4}
+    },
+    {
+      "type": "stat",
+      "title": "NATS Connections",
+      "targets": [{ "expr": "nats_connections", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":4,"w":6,"x":12,"y":0}
+    },
+    {
+      "type": "timeseries",
+      "title": "NATS Memory (bytes)",
+      "targets": [{ "expr": "nats_mem_bytes", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":8,"w":12,"x":0,"y":12}
+    },
+    {
+      "type": "timeseries",
+      "title": "NATS CPU (%)",
+      "targets": [{ "expr": "nats_cpu_pct", "refId": "A", "datasource": "Prometheus" }],
+      "gridPos": {"h":8,"w":12,"x":12,"y":12}
+    }
+  ]
+}

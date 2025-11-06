@@ -1,0 +1,35 @@
+# Patterns are case-insensitive regex. Captured groups become variables in payload templates.
+
+# Scale a service: "scale genesis to 3", "scale alpha to 5 pods"
+- name: scale_service
+  pattern: "(?:scale|set)\\s+(?P<service>[a-z0-9_-]+)\\s+(?:to|=)\\s+(?P<replicas>\\d+)"
+  subject: "whitehole.events"
+  payload:
+    type: "command.scale"
+    service: "{{service}}"
+    replicas: "{{replicas}}"
+
+# Restart service: "restart grafana", "restart whitehole"
+- name: restart_service
+  pattern: "restart\\s+(?P<service>[a-z0-9_-]+)"
+  subject: "whitehole.events"
+  payload:
+    type: "command.restart"
+    service: "{{service}}"
+
+# Status: "status", "system status"
+- name: status
+  pattern: "^(status|system status)$"
+  subject: "whitehole.events"
+  payload:
+    type: "command.status"
+    target: "cluster"
+
+# Cache purge route: "purge cache /api"
+- name: cache_purge
+  pattern: "purge\\s+cache\\s+(?P<route>\\S+)"
+  subject: "whitehole.events"
+  payload:
+    type: "command.cache_purge"
+    service: "genesis-node"
+    route: "{{route}}"

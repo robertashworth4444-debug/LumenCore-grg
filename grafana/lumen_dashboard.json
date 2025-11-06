@@ -1,0 +1,44 @@
+{
+  "title": "LumenCore Health & Telemetry",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "CPU Temp °C",
+      "targets": [
+        { "expr": "max(node_hwmon_temp_celsius{chip=~\".*cpu.*\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Undervolt Flag",
+      "targets": [
+        { "expr": "lumen_rpi_undervolt" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Disk Errors (10m)",
+      "targets": [
+        { "expr": "increase(lumen_disk_errors_total[10m])" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Core Heartbeat",
+      "targets": [
+        { "expr": "avg_over_time(lumencore_tasks_ok[5m])" }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Systemd Units",
+      "targets": [
+        { "expr": "node_systemd_unit_state{name=~\"lumen.*\",state=\"active\"}" }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "schemaVersion": 27,
+  "version": 1
+}
