@@ -1,5 +1,13 @@
 # LumenCore™ – Public Mirror
+## 🌀 Core Visuals
 
+| Genesis Grid | FlowForm Vortex | EtherFrame Assembly |
+|:--:|:--:|:--:|
+| ![Genesis Grid](docs/assets/genesis_grid.png) | ![FlowForm Vortex](docs/assets/flowform_vortex.gif) | ![EtherFrame Assembly](docs/assets/etherframe_assembly.png) |
+
+| AetherReach Console | NovaCore Reactor |
+|:--:|:--:|
+| ![AetherReach Console](docs/assets/aetherreach_console.mp4) | ![NovaCore Reactor](docs/assets/novacore_reactor.gif) |
 ### Status
 [![Stars](https://img.shields.io/github/stars/robertashworth4444-debug/LumenCore-grg?style=social)](https://github.com/robertashworth4444-debug/LumenCore-grg/stargazers)
 [![API Health](https://img.shields.io/website?url=http%3A%2F%2F5.161.52.158%3A8080%2Fhealth)](http://5.161.52.158:8080/health)
