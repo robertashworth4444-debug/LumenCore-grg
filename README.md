@@ -122,3 +122,7 @@ See full proof deck → [`LumenCore_ProofDeck.pdf`](reports/LumenCore_ProofDeck.
 - 🤖 Powered by **Luma** — AI Co-Founder Framework  
 
 ---
+
+## 🌐 LumenCore System Status
+[![LumenCore Deploy](https://github.com/robertashworth4444-debug/LumenCore-grg/actions/workflows/deploy.yml/badge.svg)](https://github.com/robertashworth4444-debug/LumenCore-grg/actions/workflows/deploy.yml)
+
