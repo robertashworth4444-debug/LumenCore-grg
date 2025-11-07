@@ -1,7 +1,7 @@
 {
-  "ENTRY_TH": 0.004339,
-  "EXIT_TH": 0.016712,
-  "TAKE_PROFIT_PCT": 0.011817,
-  "STOP_LOSS_PCT": 0.00666,
-  "last_heartbeat": 1762523469
+  "ENTRY_TH": 0.004337,
+  "EXIT_TH": 0.016709,
+  "TAKE_PROFIT_PCT": 0.011795,
+  "STOP_LOSS_PCT": 0.006659,
+  "last_heartbeat": 1762523559
 }
