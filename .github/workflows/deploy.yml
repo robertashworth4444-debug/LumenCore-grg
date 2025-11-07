@@ -1,0 +1,21 @@
+name: LumenCore Auto-Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🔁 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Trigger Live Deployment
+      run: |
+        curl -s -X POST https://lumen-core.ai/admin/deploy \
+             -H "X-Deploy-Token: ${{ secrets.LUMEN_DEPLOY_TOKEN }}" \
+             | tee deploy_log.txt
+
+    - name: 📜 Show Deployment Log
+      run: cat deploy_log.txt
