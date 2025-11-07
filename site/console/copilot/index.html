@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LumenCore™ Copilot — Voice • Personas • Memory</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070b;--card:#0a0f18;--fg:#e6eef7;--acc:#00ffd0;--ok:#00e676;--warn:#ffa600;--bad:#ff4d4d}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif}
+h1{margin:18px 0;text-align:center;background:linear-gradient(90deg,var(--acc),#2d8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wrapper{max-width:900px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:12px;box-shadow:0 0 14px rgba(0,255,208,.08);padding:16px;margin:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--acc);border:none;color:#000;font-weight:700;border-radius:8px;padding:8px 12px;cursor:pointer}
+.btn.alt{background:#2d8cff;color:#fff}
+.btn.warn{background:var(--warn);color:#000}
+.badge{padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.07)}
+#log{white-space:pre-wrap;line-height:1.5rem;max-height:50vh;overflow:auto;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px}
+.you b{color:var(--acc)} .ai b{color:#ffd54f} .sys{color:#9fb1c7}
+input,textarea{width:100%;padding:12px;border:none;border-radius:8px;background:#0d1726;color:var(--fg)}
+.small{color:#9fb1c7;font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>🧠 LumenCore Copilot</h1>
+<div class="wrapper">
+
+<div class="card">
+  <div class="row">
+    <button class="btn" onclick="setMode('investor')">Investor</button>
+    <button class="btn alt" onclick="setMode('engineer')">Engineer</button>
+    <button class="btn alt" onclick="setMode('visionary')">Visionary</button>
+    <span class="badge">Mode: <b id="mode">default</b></span>
+    <button class="btn warn" onclick="clearMem()">Clear Memory</button>
+    <button class="btn" onclick="toggleTTS()"><span id="ttsState">🔈 TTS On</span></button>
+    <button class="btn" onclick="startMic()">🎤 Speak</button>
+  </div>
+  <div class="small">Tip: <code>Ctrl+Enter</code> sends. “Speak” uses your browser mic (Web Speech API).</div>
+</div>
+
+<div class="card">
+  <input id="msg" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter'&& (event.ctrlKey||event.metaKey)) send()">
+  <div id="log"></div>
+</div>
+
+</div>
+
+<script>
+const STORE_KEY='lc_copilot_log', MODE_KEY='lc_copilot_mode', TTS_KEY='lc_copilot_tts';
+let MODE = localStorage.getItem(MODE_KEY) || 'default';
+let TTS  = localStorage.getItem(TTS_KEY) !== 'off';
+
+document.getElementById('mode').textContent = MODE;
+document.getElementById('ttsState').textContent = TTS? '🔈 TTS On' : '🔇 TTS Off';
+
+function setMode(m){ MODE=m; localStorage.setItem(MODE_KEY,m); document.getElementById('mode').textContent=m; add('sys',`<i>Mode set to <b>${m}</b></i>`); }
+function toggleTTS(){ TTS=!TTS; localStorage.setItem(TTS_KEY, TTS? 'on':'off'); document.getElementById('ttsState').textContent=TTS?'🔈 TTS On':'🔇 TTS Off'; }
+function clearMem(){ localStorage.removeItem(STORE_KEY); document.getElementById('log').innerHTML=''; add('sys','Memory cleared.'); }
+
+function add(who,html){ const log=document.getElementById('log'); const div=document.createElement('div'); div.className=who; div.innerHTML=(who==='you'?'<b>You:</b> ':'')+(who==='ai'?'<b>Luma:</b> ':'')+html; log.appendChild(div); log.scrollTop=log.scrollHeight; saveLog(); }
+function saveLog(){ localStorage.setItem(STORE_KEY, document.getElementById('log').innerHTML); }
+(function loadLog(){ const s=localStorage.getItem(STORE_KEY); if(s){ document.getElementById('log').innerHTML=s; add('sys','<i>Restored session.</i>'); }})();
+
+async function send(){
+  const el=document.getElementById('msg'); const text=(el.value||'').trim(); if(!text) return;
+  add('you', text); el.value='';
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message:text, mode:MODE})});
+    const j = await r.json();
+    const reply = (j && j.reply)? j.reply : JSON.stringify(j);
+    add('ai', reply);
+    if(TTS && 'speechSynthesis' in window){ const u=new SpeechSynthesisUtterance(reply.replace(/[*_#`]/g,'')); u.lang='en-US'; u.rate=1.0; speechSynthesis.speak(u); }
+  }catch(e){ add('sys', '⚠️ '+e); }
+}
+
+// Voice input (Web Speech API)
+function startMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ add('sys','⚠️ SpeechRecognition not supported in this browser.'); return; }
+  const rec = new SR(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+  rec.onresult=(ev)=>{ const t=ev.results[0][0].transcript; document.getElementById('msg').value=t; send(); };
+  rec.onerror=(e)=> add('sys','🎤 error: '+e.error);
+  rec.start(); add('sys','🎤 Listening…');
+}
+</script>
+</body>
+</html>

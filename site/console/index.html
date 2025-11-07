@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore™ Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',sans-serif;background:#05070b;color:#e0e0e0;margin:0;padding:0;text-align:center;}
+h1{background:linear-gradient(90deg,#00ffd0,#0066ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.container{max-width:900px;margin:auto;padding:2rem;}
+.card{background:#0a0f16;border-radius:10px;padding:1.5rem;margin:1rem 0;box-shadow:0 0 12px rgba(0,255,255,0.1);}
+.metric{font-size:2rem;margin:0.2rem 0;}
+small{color:#888;}
+canvas{max-width:100%;margin-top:1rem;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⚡ LumenCore™ Console</h1>
+  <p>Live performance metrics from the simulation engine.</p>
+  <div id="stats" class="card">
+    <p class="metric">Loading metrics…</p>
+  </div>
+  <canvas id="chart" height="140"></canvas>
+  <footer><small>© LumenCore — auto-updated every 30 s</small></footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+async function loadMetrics(){
+  try{
+    const r = await fetch("/api/metrics",{cache:"no-store"});
+    if(!r.ok) throw new Error(r.statusText);
+    const j = await r.json();
+    const box=document.getElementById("stats");
+    box.innerHTML = `
+      <p class="metric"><strong>${(j.avg_speedup||0).toFixed(2)}×</strong> Avg Speedup</p>
+      <p class="metric"><strong>${(j.max_speedup||0).toFixed(2)}×</strong> Max Speedup</p>
+      <p class="metric"><strong>${(j.thermal_gain_pct||0).toFixed(1)}%</strong> Thermal Gain</p>
+      <small>Last update ${new Date(j.timestamp).toLocaleString()}</small>`;
+    updateChart(j);
+  }catch(e){
+    document.getElementById("stats").innerHTML="<p class='metric'>⚠️ Unable to load metrics.</p>";
+  }
+}
+
+let chart;
+function updateChart(j){
+  const ctx=document.getElementById("chart").getContext("2d");
+  const data={
+    labels:["Avg Speedup","Max Speedup","Thermal Gain %"],
+    datasets:[{label:"Performance",data:[j.avg_speedup,j.max_speedup,j.thermal_gain_pct],
+               backgroundColor:["#00ffd0","#0066ff","#ffaa00"]}]
+  };
+  if(chart){chart.data=data;chart.update();}
+  else{chart=new Chart(ctx,{type:"bar",data:data,
+         options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
+}
+loadMetrics(); setInterval(loadMetrics,30000);
+</script>
+</body>
+</html>

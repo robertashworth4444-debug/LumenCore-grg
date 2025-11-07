@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LumenCore Live Status</title>
+  <style>
+    body {
+      margin:0;
+      background:#05070b;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      color:#e0e0e0;
+      font-family:Inter, sans-serif;
+    }
+    canvas { width:160px; height:160px; }
+    h2 { margin-top:20px; font-weight:400; letter-spacing:1px; }
+  </style>
+</head>
+<body>
+  <canvas id="orb"></canvas>
+  <h2 id="caption">Checking system...</h2>
+
+<script>
+const orb = document.getElementById('orb');
+const ctx = orb.getContext('2d');
+orb.width = 200; orb.height = 200;
+
+function drawOrb(color, glow) {
+  ctx.clearRect(0,0,200,200);
+  const g = ctx.createRadialGradient(100,100,20,100,100,80);
+  g.addColorStop(0,color);
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = glow;
+  ctx.beginPath();
+  ctx.arc(100,100,60,0,Math.PI*2);
+  ctx.fill();
+}
+
+async function poll(){
+  try{
+    const r = await fetch('/api/status');
+    const j = await r.json();
+    const ok = j.api==="🟢" && j.health==="🟢" && j.deploy==="🟢";
+    drawOrb(ok?'#00e676':'#ff1744', ok?40:20);
+    document.getElementById('caption').textContent =
+      ok? "System Stable – All Nodes Online":
+           "⚠️ Alert – Maintenance or Node Offline";
+  }catch(e){
+    drawOrb('#ffa600',10);
+    document.getElementById('caption').textContent = "Status: Unreachable";
+  }
+}
+poll();
+setInterval(poll,15000);
+</script>
+</body>
+</html>

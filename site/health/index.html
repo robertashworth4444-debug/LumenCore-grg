@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LumenCore™ Mission Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070f1a;--card:#0b1524;--fg:#e6eef7;--acc:#00ffd0;--warn:#ffa600;--bad:#ff4d4d;--good:#00e676}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif}
+h1{margin:18px 0;text-align:center;background:linear-gradient(90deg,var(--acc),#2d8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1180px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 0 16px rgba(0,255,208,.08)}
+.title{display:flex;align-items:center;justify-content:space-between}
+.badge{padding:4px 10px;border-radius:999px;font-size:.8rem}
+.ok{background:rgba(0,230,118,.14);color:var(--good)}
+.slow{background:rgba(255,166,0,.16);color:var(--warn)}
+.down{background:rgba(255,77,77,.16);color:var(--bad)}
+.metric{margin:.35rem 0}.small{color:#9fb1c7;font-size:.85rem}
+canvas{width:100%;height:120px;background:#0d1928;border-radius:8px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>🛰️ LumenCore Mission Control</h1>
+<div class="grid">
+
+  <div class="card">
+    <div class="title"><b>System Health</b><span class="badge ok" id="sysB">OK</span></div>
+    <div class="row">
+      <div style="flex:1">
+        <div class="metric" id="cpu">CPU: …</div>
+        <canvas id="cpuC"></canvas>
+      </div>
+      <div style="flex:1">
+        <div class="metric" id="mem">Mem: …</div>
+        <canvas id="memC"></canvas>
+      </div>
+    </div>
+    <div class="small" id="sysTs">—</div>
+  </div>
+
+  <div class="card">
+    <div class="title"><b>Requests / sec</b><span class="badge ok" id="rpsB">OK</span></div>
+    <canvas id="rpsC" style="height:160px"></canvas>
+    <div class="small" id="rpsTs">—</div>
+  </div>
+
+  <div class="card">
+    <div class="title"><b>Production API</b><span class="badge" id="pB">—</span></div>
+    <div class="metric" id="pAvg">Avg Speedup: —</div>
+    <div class="metric" id="pMax">Max Speedup: —</div>
+    <div class="metric" id="pTherm">Thermal Gain: —</div>
+    <div class="small" id="pTs">—</div>
+  </div>
+
+  <div class="card">
+    <div class="title"><b>Staging API</b><span class="badge" id="sB">—</span></div>
+    <div class="metric" id="sAvg">Avg Speedup: —</div>
+    <div class="metric" id="sMax">Max Speedup: —</div>
+    <div class="metric" id="sTherm">Thermal Gain: —</div>
+    <div class="small" id="sTs">—</div>
+  </div>
+
+</div>
+
+<script>
+const cpuHist=[], memHist=[], rpsHist=[];
+const maxPts=60;
+const sysB=document.getElementById('sysB'), rpsB=document.getElementById('rpsB'), pB=document.getElementById('pB'), sB=document.getElementById('sB');
+function badge(el,ms){el.className='badge ' + (ms<800?'ok':(ms<2000?'slow':'down'));}
+
+function drawLine(canvas, arr, color){
+  const ctx=canvas.getContext('2d'), w=canvas.width=canvas.clientWidth, h=canvas.height=canvas.clientHeight;
+  ctx.clearRect(0,0,w,h); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+  const n=arr.length||1; for(let i=0;i<n;i++){const x=i*(w/(maxPts-1)); const y=h - (h*(arr[i]||0)/100); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);} ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; for(let y=0;y<=100;y+=25){const yy=h - h*(y/100); ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(w,yy); ctx.stroke();}
+}
+function drawBars(canvas, arr){
+  const ctx=canvas.getContext('2d'), w=canvas.width=canvas.clientWidth, h=canvas.height=canvas.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  const n=arr.length; const bw = Math.max(2, w/maxPts-2); ctx.fillStyle='#00ffd0';
+  for(let i=0;i<n;i++){ const x = i*(w/maxPts); const val = arr[i]||0; const bh = Math.min(h-2, (val/Math.max(...arr,1))*h); ctx.fillRect(x, h-bh, bw, bh); }
+}
+
+async function timed(u){ const t0=performance.now(); let ok=false, j=null; try{ const r=await fetch(u,{cache:'no-store'}); ok=r.ok; if(ok) j=await r.json(); }catch(e){} const dt=performance.now()-t0; return {ok,dt,j}; }
+
+async function tick(){
+  // system
+  const h=await timed('/api/health');
+  if(h.ok && h.j){ document.getElementById('cpu').textContent='CPU: '+h.j.cpu_percent+' %'; document.getElementById('mem').textContent='Mem: '+h.j.mem_used_mb+' / '+h.j.mem_total_mb+' MB'; document.getElementById('sysTs').textContent=h.j.timestamp+' UTC'; sysB.className='badge ok'; cpuHist.push(Math.min(100,h.j.cpu_percent)); memHist.push(Math.min(100,(100*h.j.mem_used_mb/h.j.mem_total_mb))); }
+  else { sysB.className='badge down'; cpuHist.push(0); memHist.push(0); }
+  while(cpuHist.length>maxPts) cpuHist.shift(); while(memHist.length>maxPts) memHist.shift();
+  drawLine(document.getElementById('cpuC'), cpuHist, '#00ffd0');
+  drawLine(document.getElementById('memC'), memHist, '#2d8cff');
+
+  // nginx rps
+  const n=await timed('/api/nginx'); const now=Date.now();
+  if(n.ok && n.j){ const rps = (n.j.requests - (window._rq0||n.j.requests))/5 || 0; window._rq0 = n.j.requests; rpsHist.push(Math.max(0,Math.round(rps))); badge(rpsB, n.dt); document.getElementById('rpsTs').textContent=new Date(now).toLocaleTimeString()+' • '+rps+' req/s'; }
+  else { rpsHist.push(0); rpsB.className='badge down'; }
+  while(rpsHist.length>maxPts) rpsHist.shift(); drawBars(document.getElementById('rpsC'), rpsHist);
+
+  // prod
+  const p=await timed('/api/metrics'); if(p.ok && p.j){ document.getElementById('pAvg').textContent='Avg Speedup: '+(p.j.avg_speedup??'—'); document.getElementById('pMax').textContent='Max Speedup: '+(p.j.max_speedup??'—'); document.getElementById('pTherm').textContent='Thermal Gain: '+(p.j.thermal_gain_pct??'—')+'%'; document.getElementById('pTs').textContent=(p.j.timestamp||'')+' • '+Math.round(p.dt)+' ms'; badge(pB,p.dt); } else { pB.className='badge down'; }
+  // staging
+  const s=await timed('/api-staging/metrics'); if(s.ok && s.j){ document.getElementById('sAvg').textContent='Avg Speedup: '+(s.j.avg_speedup??'—'); document.getElementById('sMax').textContent='Max Speedup: '+(s.j.max_speedup??'—'); document.getElementById('sTherm').textContent='Thermal Gain: '+(s.j.thermal_gain_pct??'—')+'%'; document.getElementById('sTs').textContent=(s.j.timestamp||'')+' • '+Math.round(s.dt)+' ms'; badge(sB,s.dt); } else { sB.className='badge down'; }
+}
+tick(); setInterval(tick,5000);
+</script>
+</body>
+</html>

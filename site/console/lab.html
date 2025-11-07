@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LumenCore Lab Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#07111e;color:#e6eef7;font-family:Inter,system-ui}
+.wrap{max-width:960px;margin:0 auto;padding:20px}
+h1{background:linear-gradient(90deg,#00ffd0,#2d8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+input,textarea{width:100%;padding:10px;border:none;border-radius:8px;background:#0d1a2a;color:#e6eef7}
+.btn{background:#2d8cff;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;margin:6px 6px 0 0}
+pre{white-space:pre-wrap;background:#0b1524;padding:12px;border-radius:8px;max-height:55vh;overflow:auto}
+.small{color:#9fb1c7}
+#snack{opacity:0;transition:opacity .5s;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0b1524;color:#e6eef7;padding:8px 12px;border-radius:8px;box-shadow:0 0 10px rgba(0,255,208,.2)}
+</style></head><body>
+<div class="wrap">
+<h1>🧪 LumenCore Lab Console</h1>
+<p class="small">Enter RUN TOKEN (for /api-run/* and /api-stream/*):</p>
+<input id="tok" placeholder="X-Run-Token">
+<div style="margin-top:12px">
+  <button class="btn" onclick="call('spiral')">Run Spiral</button>
+  <button class="btn" onclick="call('nova')">Run Nova Auto-Tune</button>
+  <button class="btn" onclick="call('prestige')">Run PRESTIGE</button>
+  <button class="btn" onclick="call('reindex')">Re-Index</button>
+  <a class="btn" href="/console/sim-index.html" target="_blank">Open Index</a>
+</div>
+
+<h3 style="margin-top:18px">📡 Live Run Stream</h3>
+<div>
+  <button class="btn" onclick="streamSim('spiral')">Live Spiral</button>
+  <button class="btn" onclick="streamSim('nova')">Live Nova</button>
+  <button class="btn" onclick="streamSim('prestige')">Live PRESTIGE</button>
+  <button class="btn" onclick="stopStream()">Stop</button>
+</div>
+<pre id="log">Ready.</pre>
+<div id="snack">Synced.</div>
+</div>
+<script>
+async function call(which){
+  const t=document.getElementById('tok').value.trim(); if(!t){ alert('Enter token'); return; }
+  const log=document.getElementById('log'); log.textContent='Running '+which+'…';
+  try{
+    const r=await fetch('/api-run/'+which,{method:'POST',headers:{'X-Run-Token':t}});
+    const j=await r.json(); log.textContent=(j.ok?'✅ SUCCESS\n\n':'❌ ERROR\n\n')+(j.stdout||j.log||JSON.stringify(j,null,2));
+    try{
+      const h=await fetch('/api-run/harvest',{method:'POST',headers:{'X-Run-Token':t}});
+      const jj=await h.json(); const sn=document.getElementById('snack');
+      sn.textContent=(jj.ok?'✅ Catalog synced':'⚠️ Sync error'); sn.style.opacity=1; setTimeout(()=>sn.style.opacity=0,3000);
+    }catch(e){}
+  }catch(e){ log.textContent='⚠ '+e; }
+}
+
+let es=null;
+function streamSim(which){
+  const t=document.getElementById('tok').value.trim(); if(!t){ alert('Enter token'); return; }
+  stopStream();
+  const log=document.getElementById('log'); log.textContent='[Streaming] '+which+'…\\n';
+  const url = '/api-stream/'+which+'?token='+encodeURIComponent(t);
+  es = new EventSource(url);
+  es.onmessage = (ev)=>{ log.textContent += ev.data + "\\n"; log.scrollTop=log.scrollHeight; };
+  es.addEventListener('done', async (ev)=>{
+    log.textContent += "\\n--- run complete ---\\n";
+    try{
+      const r=await fetch('/api-run/harvest',{method:'POST',headers:{'X-Run-Token':t}});
+      const jj=await r.json(); const sn=document.getElementById('snack');
+      sn.textContent=(jj.ok?'✅ Catalog synced':'⚠️ Sync error'); sn.style.opacity=1; setTimeout(()=>sn.style.opacity=0,3000);
+    }catch(e){}
+    stopStream();
+  });
+  es.onerror = ()=>{ stopStream(); };
+}
+function stopStream(){ if(es){ es.close(); es=null; } }
+</script>
+</body></html>

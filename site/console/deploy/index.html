@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore™ Deploy Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#07101c;color:#e6eef7;font-family:'Inter',sans-serif}
+.wrapper{max-width:900px;margin:0 auto;padding:20px}
+h1{background:linear-gradient(90deg,#00ffd0,#2d8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+input,textarea{width:100%;padding:10px;border:none;border-radius:8px;background:#0e1a2a;color:#e6eef7}
+.btn{background:#2d8cff;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;margin-top:10px}
+.small{color:#9fb1c7}
+pre{white-space:pre-wrap;background:#0b1524;padding:12px;border-radius:8px;max-height:60vh;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <h1>🚀 LumenCore Deploy Console</h1>
+  <p class="small">Enter your deploy token once; it is stored locally in your browser.</p>
+  <input id="tok" placeholder="X-Deploy-Token">
+  <button class="btn" onclick="deploy()">Run Deploy</button>
+  <p class="small">POST → <code>/admin/deploy</code></p>
+  <pre id="log">Ready.</pre>
+</div>
+<script>
+const key='lc_deploy_token';
+document.getElementById('tok').value = localStorage.getItem(key)||'';
+async function deploy(){
+  const t=document.getElementById('tok').value.trim();
+  if(!t){ alert('Enter token'); return; }
+  localStorage.setItem(key,t);
+  const out=document.getElementById('log'); out.textContent='Deploying…';
+  try{
+    const r=await fetch('/admin/deploy',{method:'POST',headers:{'X-Deploy-Token':t}});
+    const j=await r.json();
+    out.textContent = (j.ok?'✅ SUCCESS\n\n':'❌ ERROR\n\n') + (j.log || JSON.stringify(j));
+  }catch(e){ out.textContent='⚠ '+e; }
+}
+</script>
+</body>
+</html>

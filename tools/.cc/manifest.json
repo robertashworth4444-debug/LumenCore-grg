@@ -1,0 +1,13 @@
+{
+  "title": "Content Credentials - LumenCore/Novacore",
+  "assertions": [
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "name": "LumenCore/Novacore Artifact",
+        "creator": "Robert Ashworth (LumenCore)",
+        "license": "https://opensource.org/licenses/MIT"
+      }
+    }
+  ]
+}

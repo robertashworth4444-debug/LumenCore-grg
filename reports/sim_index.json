@@ -1,0 +1,24 @@
+{
+  "generated_utc": "2025-11-07T06:02:07.666812Z",
+  "count": 3,
+  "items": [
+    {
+      "type": "report",
+      "path": "/opt/lumen-core/reports/LumenCore_InvestorDeck.pdf",
+      "name": "LumenCore_InvestorDeck.pdf",
+      "timestamp": "2025-11-06T20:57:33.409414Z"
+    },
+    {
+      "type": "report",
+      "path": "/opt/lumen-core/reports/thermal_flat.png",
+      "name": "thermal_flat.png",
+      "timestamp": "2025-11-06T20:20:57.424689Z"
+    },
+    {
+      "type": "report",
+      "path": "/opt/lumen-core/reports/thermal_curved.png",
+      "name": "thermal_curved.png",
+      "timestamp": "2025-11-06T20:20:57.424684Z"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "timestamp": "20251107T060150Z",
+  "best_config": {
+    "f0": 3.0,
+    "df": 0.008,
+    "noise": 0.03,
+    "gain_c": 0.08
+  },
+  "refined_metrics": {
+    "median_SI": 0.588059,
+    "median_SI_CI95": [
+      0.584954,
+      0.591287
+    ],
+    "integrated_error_energy": 15.014748,
+    "spectral_coherence_ratio": 2582950.557018
+  },
+  "composite_score": -0.38267,
+  "files": [
+    "best_timeseries.csv",
+    "plot_timeseries.png",
+    "plot_psd.png",
+    "grid_results.csv",
+    "plot_heatmap.png"
+  ]
+}

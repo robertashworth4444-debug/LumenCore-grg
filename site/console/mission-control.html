@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LumenCore Mission Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;background:#05070b;color:#e0e0e0;
+  font-family:'Inter',sans-serif;display:flex;flex-direction:column;height:100vh;
+}
+header {
+  display:flex;justify-content:space-between;align-items:center;
+  background:#0b1524;padding:15px 30px;border-bottom:1px solid #111;
+}
+h1{font-size:20px;letter-spacing:1px}
+canvas{width:60px;height:60px}
+main {
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.gauges{display:flex;gap:40px;margin-top:40px}
+.gauge{
+  width:120px;height:120px;position:relative;border-radius:50%;
+  background:conic-gradient(#00e676 0deg,#00e676 0deg,#222 0deg 360deg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#e0e0e0;text-shadow:0 0 5px #000;
+}
+.gauge span{position:absolute;font-size:14px;bottom:-30px;text-align:center;width:100%}
+</style>
+</head>
+<body>
+<header>
+  <h1>🚀 LumenCore™ Mission Control</h1>
+  <canvas id="orb"></canvas>
+</header>
+<main>
+  <div id="statusText">Initializing system status...</div>
+  <div class="gauges">
+    <div class="gauge" id="cpuGauge"><span>CPU</span></div>
+    <div class="gauge" id="memGauge"><span>Memory</span></div>
+    <div class="gauge" id="loadGauge"><span>Load</span></div>
+  </div>
+</main>
+
+<script>
+const orb=document.getElementById('orb');
+const ctx=orb.getContext('2d');
+orb.width=100;orb.height=100;
+function drawOrb(color,glow){
+  ctx.clearRect(0,0,100,100);
+  const g=ctx.createRadialGradient(50,50,15,50,50,40);
+  g.addColorStop(0,color);
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.shadowColor=color;ctx.shadowBlur=glow;
+  ctx.beginPath();ctx.arc(50,50,30,0,Math.PI*2);ctx.fill();
+}
+
+function updateGauge(el,val,color){
+  const deg=Math.min(val,100)*3.6;
+  el.style.background=`conic-gradient(${color} ${deg}deg,#222 ${deg}deg 360deg)`;
+  el.textContent=val+'%';
+}
+
+async function poll(){
+  try{
+    const r=await fetch('/api/status');
+    const j=await r.json();
+    const ok=j.api==='🟢'&&j.health==='🟢'&&j.deploy==='🟢';
+    drawOrb(ok?'#00e676':'#ff1744',ok?20:10);
+    document.getElementById('statusText').textContent=ok?'✅ All Systems Nominal':'⚠️ System Anomaly Detected';
+  }catch{drawOrb('#ffa600',5);document.getElementById('statusText').textContent='⚠️ Status Unreachable';}
+  try{
+    const sys=await (await fetch('/api/metrics')).json();
+    updateGauge(document.getElementById('cpuGauge'),sys.cpu||0,'#00e676');
+    updateGauge(document.getElementById('memGauge'),sys.memory||0,'#00b0ff');
+    updateGauge(document.getElementById('loadGauge'),sys.load||0,'#ffa600');
+  }catch{}
+}
+poll();setInterval(poll,15000);
+</script>
+</body>
+</html>

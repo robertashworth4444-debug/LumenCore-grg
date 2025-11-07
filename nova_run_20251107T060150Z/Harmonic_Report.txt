@@ -1,0 +1,23 @@
+LumenCore/NovaCore – Harmonic Auto-Tune Report
+UTC: 20251107T060150Z
+
+Best Config:
+{
+  "f0": 3.0,
+  "df": 0.008,
+  "noise": 0.03,
+  "gain_c": 0.08
+}
+
+Refined Metrics:
+{
+  "median_SI": 0.588059,
+  "median_SI_CI95": [
+    0.584954,
+    0.591287
+  ],
+  "integrated_error_energy": 15.014748,
+  "spectral_coherence_ratio": 2582950.557018
+}
+
+Composite Score: -0.38267
